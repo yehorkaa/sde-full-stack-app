@@ -1,0 +1,53 @@
+{
+  "name": "sde-front-end",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/sde-front-end",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/sde-front-end"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "apps/sde-front-end/.next"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "sde-front-end:build:development"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "sde-front-end:build:development"
+        },
+        "production": {
+          "buildTarget": "sde-front-end:build:production"
+        }
+      }
+    },
+    "dev": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "sde-front-end:build:development"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "sde-front-end:build:development"
+        },
+        "production": {
+          "buildTarget": "sde-front-end:build:production"
+        }
+      }
+    }
+  }
+}

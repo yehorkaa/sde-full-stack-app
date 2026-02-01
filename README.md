@@ -1,96 +1,189 @@
-# SdeChallengeFs
+# SDE Challenge - Message App
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A full-stack message application built with Nx monorepo, featuring Next.js frontend and NestJS backend.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- User authentication (sign-up, sign-in) with JWT tokens
+- Automatic token refresh via Axios interceptors
+- Create, read, update, delete messages (max 240 characters)
+- Filter messages by tag, author, and date range
+- Cursor-based pagination with infinite scroll
+- List virtualization for performance
+- Optimistic UI updates for edit/delete operations
+- Ownership-based edit/delete permissions
 
-## Run tasks
+## Tech Stack
 
-To run tasks with Nx use:
+### Frontend
+- Next.js 14 (App Router)
+- TypeScript
+- TanStack Query for data fetching/caching
+- Axios with interceptors for API calls
+- Tailwind CSS with shadcn/ui components
+- react-cool-virtual for list virtualization
 
-```sh
-npx nx <target> <project-name>
+### Backend
+- NestJS
+- MongoDB with Mongoose
+- JWT authentication (@nestjs/jwt)
+- bcrypt for password hashing
+- class-validator for DTO validation
+
+### Infrastructure
+- Nx monorepo
+- Docker Compose for MongoDB
+- Shared types library
+
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+- Docker and Docker Compose
+
+## Quick Start
+
+### 1. Clone and Install Dependencies
+
+```bash
+cd sde-challenge-fs
+npm install
 ```
 
-For example:
+### 2. Start MongoDB
 
-```sh
-npx nx build myproject
+```bash
+docker-compose up -d
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+### 3. Configure Environment
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Backend environment is pre-configured in `apps/sde-back-end/.env`. For production, update:
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
+```bash
+# apps/sde-back-end/.env
+MONGODB_URI=mongodb://admin:password123@localhost:27017/sde_messages?authSource=admin
+JWT_SECRET=your-production-secret-key
+JWT_ACCESS_TOKEN_TTL=3600
+JWT_REFRESH_TOKEN_TTL=86400
+PORT=3001
 ```
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+Frontend environment:
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
+```bash
+# apps/sde-front-end/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### 4. Run the Applications
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+#### Option A: Run both in parallel
+```bash
+npx nx run-many -t serve -p sde-front-end sde-back-end
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+#### Option B: Run separately
+```bash
+# Terminal 1 - Backend
+npx nx serve sde-back-end
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+# Terminal 2 - Frontend
+npx nx serve sde-front-end
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### 5. Access the App
 
-## Install Nx Console
+- Frontend: http://localhost:4200
+- Backend API: http://localhost:3001/api
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## Available Commands
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+# Development
+npx nx serve sde-front-end    # Start frontend dev server
+npx nx serve sde-back-end     # Start backend dev server
+npx nx run-many -t serve      # Start all apps
 
-## Useful links
+# Build
+npx nx build sde-front-end    # Build frontend
+npx nx build sde-back-end     # Build backend
+npx nx run-many -t build      # Build all
 
-Learn more:
+# Testing
+npx nx test sde-back-end      # Run backend tests
+npx nx test sde-front-end     # Run frontend tests
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Linting
+npx nx lint sde-front-end     # Lint frontend
+npx nx lint sde-back-end      # Lint backend
+npx nx run-many -t lint       # Lint all
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Generate
+npx nx g @nx/js:library my-lib --directory=libs/my-lib  # New library
+```
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/auth/sign-up | Register new user |
+| POST | /api/auth/sign-in | Login |
+| POST | /api/auth/refresh-token | Refresh access token |
+| POST | /api/auth/logout | Logout |
+| GET | /api/auth/me | Get current user |
+
+### Messages
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/messages | List messages (with filters) |
+| POST | /api/messages | Create message |
+| GET | /api/messages/:id | Get single message |
+| PATCH | /api/messages/:id | Update message (owner only) |
+| DELETE | /api/messages/:id | Delete message (owner only) |
+
+### Query Parameters for GET /api/messages
+- `tag` - Filter by tag (general, announcement, question, idea, feedback)
+- `authorId` - Filter by author ID
+- `fromDate` - Filter by start date (ISO string)
+- `toDate` - Filter by end date (ISO string)
+- `cursor` - Pagination cursor (message ID)
+- `limit` - Page size (default: 20, max: 50)
+
+## Project Structure
+
+```
+sde-challenge-fs/
+├── apps/
+│   ├── sde-front-end/         # Next.js frontend
+│   │   └── src/
+│   │       ├── app/           # App Router pages
+│   │       ├── components/    # React components
+│   │       ├── lib/           # API clients, hooks
+│   │       └── providers/     # Context providers
+│   └── sde-back-end/          # NestJS backend
+│       └── src/
+│           └── app/
+│               └── modules/   # Feature modules
+├── libs/
+│   └── shared-types/          # Shared TypeScript types
+├── docker-compose.yml
+└── .env.example
+```
+
+## Development Notes
+
+### Token Flow
+1. On sign-in/sign-up: Access token set as httpOnly cookie, refresh token returned in response body
+2. Frontend stores refresh token in localStorage
+3. On 401 response: Axios interceptor automatically calls refresh endpoint
+4. New tokens are set, and the original request is retried
+
+### Database Indexes
+The Message collection has indexes on:
+- `tag` + `_id` (compound, for tag filtering with pagination)
+- `authorId` + `_id` (compound, for author filtering with pagination)
+- `createdAt` (for date sorting)
+
+```
